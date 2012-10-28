@@ -20,11 +20,15 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FXEdge {
 
     FXNode source;
     FXNode destination;
     Node displayShape;
+    List<FXEdgeWayPoint> wayPoints = new ArrayList<FXEdgeWayPoint>();
 
     public FXEdge(FXNode aSource, FXNode aDestination) {
         source = aSource;
@@ -35,11 +39,29 @@ public class FXEdge {
         return  displayShape;
     }
 
+    public void addWayPoint(FXEdgeWayPoint aWayPoint) {
+        wayPoints.add(aWayPoint);
+    }
+
+    public void removeWayPoint(FXEdgeWayPoint aWayPoint) {
+        wayPoints.remove(aWayPoint);
+    }
+
     public void computeDisplayShape() {
         Path thePath = new Path();
+
+        // From the middle of the source
         Bounds theSourceBounds = source.wrappedNode.getBoundsInParent();
         MoveTo theMoveTo = new MoveTo(theSourceBounds.getMinX() + theSourceBounds.getWidth() / 2, theSourceBounds.getMinY() + theSourceBounds.getHeight() / 2);
         thePath.getElements().add(theMoveTo);
+
+        // Thru the waypoints
+        for (FXEdgeWayPoint theWayPoint : wayPoints) {
+            LineTo theLineTo = new LineTo(theWayPoint.positionX, theWayPoint.positionY);
+            thePath.getElements().add(theLineTo);
+        }
+
+        // To the middle of the destination
         Bounds theDestinationBounds = destination.wrappedNode.getBoundsInParent();
         LineTo theLineTo = new LineTo(theDestinationBounds.getMinX() + theDestinationBounds.getWidth() / 2, theDestinationBounds.getMinY() + theDestinationBounds.getHeight() / 2);
         thePath.getElements().add(theLineTo);
