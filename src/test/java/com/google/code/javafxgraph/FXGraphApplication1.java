@@ -44,12 +44,14 @@ public class FXGraphApplication1 extends Application {
             double positionX = centerX + Math.cos(Math.toRadians(360 / numNodes * i)) * radius;
             double positionY = centerY + Math.sin(Math.toRadians(360 / numNodes * i)) * radius;
 
-            FXNode theButtonNode = theGraph.createNodeFor(button1, positionX, positionY);
-            theNodes.add(theButtonNode);
+            FXNodeBuilder theNodeBuilder = new FXNodeBuilder(theGraph);
+            theNodes.add(theNodeBuilder.node(button1).x(positionX).y(positionY).build());
         }
 
         for (int i = 0; i < theNodes.size() - 1; i++) {
-            theGraph.createEdgeFor(theNodes.get(i), theNodes.get(i + 1));
+
+            FXEdgeBuilder theEdgeBuilder = new FXEdgeBuilder(theGraph);
+            theEdgeBuilder.source(theNodes.get(i)).destination(theNodes.get(i+1)).build();
         }
 
         aStage.setScene(new Scene(theGraph));
