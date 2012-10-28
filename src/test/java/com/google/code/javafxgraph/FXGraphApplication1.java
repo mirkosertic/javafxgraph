@@ -21,7 +21,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JXGraphApplication1 extends Application {
+public class FXGraphApplication1 extends Application {
 
     @Override
     public void start(Stage aStage) throws Exception {
@@ -58,6 +58,6 @@ public class JXGraphApplication1 extends Application {
     }
 
     public static void main(String[] args) {
-        Application.launch(JXGraphApplication1.class, args);
+        Application.launch(FXGraphApplication1.class, args);
     }
 }
