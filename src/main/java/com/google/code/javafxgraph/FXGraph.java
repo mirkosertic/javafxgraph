@@ -50,17 +50,23 @@ public class FXGraph extends ScrollPane {
         currentTool = selectionTool;
     }
 
-    void updateEdgeNodesFor(FXNode aNode) {
+    void updateEdge(FXEdge aEdge, double aZoomLevel) {
+        aEdge.removeAllNodes(contentPane);
+        aEdge.computeDisplayShape(aZoomLevel);
+        aEdge.addAllNodes(contentPane, EDGES_Z_OFFSET);
+        mouseHandler.registerNewEdge(aEdge);
+    }
+
+    void updateEdgeNodesFor(FXNode aNode, double aZoomLevel) {
         for (FXEdge theEdge : model.getEdges()) {
             if (theEdge.source == aNode || theEdge.destination == aNode) {
-                contentPane.getChildren().remove(theEdge.getDisplayShape());
-                theEdge.computeDisplayShape();
-
-                Node theNode = theEdge.getDisplayShape();
-                contentPane.getChildren().add(theNode);
-                theNode.toBack();
+                updateEdge(theEdge, aZoomLevel);
             }
         }
+    }
+
+    void updateEdgeNodesFor(FXNode aNode) {
+        updateEdgeNodesFor(aNode, zoomHandler.currentZoomLevel);
     }
 
     public void updateSelectionInScene() {
@@ -68,23 +74,22 @@ public class FXGraph extends ScrollPane {
     }
 
     public void addNode(FXNode aNode) {
-        mouseHandler.registerNewNode(aNode);
 
         aNode.wrappedNode.setTranslateZ(NODES_Z_OFFSET);
 
         contentPane.getChildren().add(aNode.wrappedNode);
 
         model.registerNewNode(aNode);
+        mouseHandler.registerNewNode(aNode);
     }
 
     public void addEdge(FXEdge aEdge) {
-        aEdge.computeDisplayShape();
-        Node theNode = aEdge.getDisplayShape();
-        theNode.setTranslateZ(EDGES_Z_OFFSET);
 
-        contentPane.getChildren().add(theNode);
-        theNode.toBack();
+        aEdge.computeDisplayShape(zoomHandler.currentZoomLevel);
 
+        aEdge.addAllNodes(contentPane, EDGES_Z_OFFSET);
         model.registerNewEdge(aEdge);
+
+        mouseHandler.registerNewEdge(aEdge);
     }
 }

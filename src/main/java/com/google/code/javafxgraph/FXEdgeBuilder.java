@@ -43,7 +43,7 @@ public class FXEdgeBuilder {
     }
 
     public FXEdge build() {
-        FXEdge theEdge = new FXEdge(source, destination);
+        FXEdge theEdge = new FXEdge(graph, source, destination);
         theEdge.wayPoints.addAll(wayPoints);
 
         graph.addEdge(theEdge);

@@ -48,6 +48,7 @@ public class FXGraphSelectionTool extends FXTool {
     private double lastDragX;
     private double lastDragY;
     private boolean mousePressedOnNodeOrSelection;
+    private FXEdgeWayPoint pressedWaypoint;
 
     FXGraphSelectionTool(Pane aOwningControl, FXGraphModel aModel, FXGraphZoomHandler aZoomHandler) {
         owningControl = aOwningControl;
@@ -79,10 +80,10 @@ public class FXGraphSelectionTool extends FXTool {
 
             for (FXNode theNode : currentSelection) {
                 Bounds theBounds = theNode.wrappedNode.getBoundsInParent();
-                minX = Math.min(minX,  theBounds.getMinX());
-                minY = Math.min(minY,  theBounds.getMinY());
+                minX = Math.min(minX, theBounds.getMinX());
+                minY = Math.min(minY, theBounds.getMinY());
                 maxX = Math.max(maxX, theBounds.getMaxX());
-                maxY = Math.max(maxY,  theBounds.getMaxY());
+                maxY = Math.max(maxY, theBounds.getMaxY());
             }
 
             double startX = minX - 20;
@@ -91,7 +92,7 @@ public class FXGraphSelectionTool extends FXTool {
             double height = maxY - minY + 40;
 
             RectangleBuilder theBuilder = RectangleBuilder.create();
-            theBuilder.x(startX).y(startY).width(width).height(height).strokeWidth(1).stroke(Color.BLACK).strokeDashArray(3.0,7.0,3.0,7.0).fill(Color.TRANSPARENT).mouseTransparent(true);
+            theBuilder.x(startX).y(startY).width(width).height(height).strokeWidth(1).stroke(Color.BLACK).strokeDashArray(3.0, 7.0, 3.0, 7.0).fill(Color.TRANSPARENT).mouseTransparent(true);
 
             currentSelectionRectangle = theBuilder.build();
             currentSelectionRectangle.setTranslateZ(SELECTION_Z_OFFSET);
@@ -133,7 +134,7 @@ public class FXGraphSelectionTool extends FXTool {
 
     public void startSelectionAt(double aSceneX, double aSceneY) {
         RectangleBuilder theBuilder = RectangleBuilder.create();
-        theBuilder.x(aSceneX).y(aSceneY).width(1).height(1).strokeWidth(1).stroke(Color.BLACK).strokeDashArray(3.0,7.0,3.0,7.0).fill(Color.TRANSPARENT).mouseTransparent(true);
+        theBuilder.x(aSceneX).y(aSceneY).width(1).height(1).strokeWidth(1).stroke(Color.BLACK).strokeDashArray(3.0, 7.0, 3.0, 7.0).fill(Color.TRANSPARENT).mouseTransparent(true);
 
         interactiveSelectionRectangle = theBuilder.build();
         interactiveSelectionRectangle.setTranslateZ(SELECTION_Z_OFFSET);
@@ -182,6 +183,7 @@ public class FXGraphSelectionTool extends FXTool {
     public void mousePressedOnNode(MouseEvent aEvent, FXNode aNode) {
 
         mousePressedOnNodeOrSelection = true;
+        pressedWaypoint = null;
 
         if (!(aEvent.isControlDown() || aEvent.isShiftDown())) {
             resetSelection();
@@ -197,9 +199,29 @@ public class FXGraphSelectionTool extends FXTool {
     }
 
     @Override
+    public void mousePressedOnEdge(MouseEvent aEvent, FXEdge aEdge) {
+
+        mousePressedOnNodeOrSelection = true;
+        pressedWaypoint = null;
+
+        if (aEvent.isShiftDown()) {
+            aEdge.addWayPoint(new FXEdgeWayPoint(aEdge, aEvent.getSceneX() / zoomHandler.currentZoomLevel, aEvent.getSceneY() / zoomHandler.currentZoomLevel));
+        }
+        resetSelection();
+        updateSelectionInScene();
+    }
+
+    @Override
+    public void mousePressedOnEdgeWayPoint(MouseEvent aEvent, FXEdgeWayPoint aWayPoint) {
+        mousePressedOnNodeOrSelection = false;
+        pressedWaypoint = aWayPoint;
+    }
+
+    @Override
     public void mousePressed(MouseEvent aEvent) {
 
         mousePressedOnNodeOrSelection = false;
+        pressedWaypoint = null;
 
         Rectangle theSelection = getCurrentSelectionRectangle();
         if (theSelection != null) {
@@ -211,16 +233,21 @@ public class FXGraphSelectionTool extends FXTool {
 
     @Override
     public void mouseDragged(MouseEvent aEvent) {
-        if (mousePressedOnNodeOrSelection) {
+        if (mousePressedOnNodeOrSelection || pressedWaypoint != null) {
             if (!dragging) {
                 dragging = true;
             } else {
                 double movementX = aEvent.getSceneX() - lastDragX;
                 double movementY = aEvent.getSceneY() - lastDragY;
 
-                for (FXNode theNode : getCurrentSelection()) {
-                    theNode.translatePosition(movementX, movementY, zoomHandler.currentZoomLevel);
+                if (pressedWaypoint == null) {
+                    for (FXNode theNode : getCurrentSelection()) {
+                        theNode.translatePosition(movementX, movementY, zoomHandler.currentZoomLevel);
+                    }
+                } else {
+                    pressedWaypoint.translatePosition(movementX, movementY, zoomHandler.currentZoomLevel);
                 }
+
 
                 updateSelectionInScene();
             }

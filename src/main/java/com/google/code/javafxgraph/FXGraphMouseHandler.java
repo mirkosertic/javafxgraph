@@ -35,10 +35,18 @@ public class FXGraphMouseHandler {
             @Override
             public void handle(MouseEvent aEvent) {
 
-                // Click on a node in the scene?
-                FXNode theNode = graph.model.getNodeFor(aEvent.getSource());
-                if (theNode != null) {
-                    graph.currentTool.mousePressedOnNode(aEvent, theNode);
+                Object theSource = aEvent.getSource();
+                if (theSource instanceof Node) {
+                    Node theNode = (Node) theSource;
+                    Object theUserData = theNode.getUserData();
+
+                    if (theUserData instanceof FXNode) {
+                        graph.currentTool.mousePressedOnNode(aEvent, (FXNode) theUserData);
+                    } else if (theUserData instanceof FXEdge) {
+                        graph.currentTool.mousePressedOnEdge(aEvent, (FXEdge) theUserData);
+                    } else if (theUserData instanceof FXEdgeWayPoint) {
+                        graph.currentTool.mousePressedOnEdgeWayPoint(aEvent, (FXEdgeWayPoint) theUserData);
+                    } else graph.currentTool.mousePressed(aEvent);
                 } else {
                     graph.currentTool.mousePressed(aEvent);
                 }
@@ -88,5 +96,12 @@ public class FXGraphMouseHandler {
 
     public void registerNewNode(FXNode aNode) {
         registerHandlerFor(aNode.wrappedNode);
+    }
+
+    public void registerNewEdge(FXEdge aEdge) {
+        registerHandlerFor(aEdge.displayShape);
+        for (Node theNode : aEdge.wayPointHandles.values()) {
+            registerHandlerFor(theNode);
+        }
     }
 }

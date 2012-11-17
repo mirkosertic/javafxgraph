@@ -28,6 +28,7 @@ public class FXNode {
     FXNode(FXGraph aOwner, Node aNode) {
         wrappedNode = aNode;
         owner = aOwner;
+        aNode.setUserData(this);
     }
 
     public void setPosition(double aPositionX, double aPositionY) {
@@ -54,6 +55,6 @@ public class FXNode {
         wrappedNode.setScaleX(aZoomLevel);
         wrappedNode.setScaleY(aZoomLevel);
 
-        owner.updateEdgeNodesFor(this);
+        owner.updateEdgeNodesFor(this, aZoomLevel);
     }
 }

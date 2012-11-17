@@ -17,9 +17,18 @@ public class FXEdgeWayPoint {
 
     double positionX;
     double positionY;
+    FXEdge edge;
 
-    public FXEdgeWayPoint(double aPositionX, double aPositionY) {
+    public FXEdgeWayPoint(FXEdge aEdge, double aPositionX, double aPositionY) {
+        edge = aEdge;
         positionX = aPositionX;
         positionY = aPositionY;
+    }
+
+    public void translatePosition(double aMovementX, double aMovementY, double aZoomLevel) {
+        positionX += aMovementX / aZoomLevel;
+        positionY += aMovementY / aZoomLevel;
+
+        edge.graph.updateEdge(edge, aZoomLevel);
     }
 }

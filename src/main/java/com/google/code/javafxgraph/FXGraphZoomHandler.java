@@ -63,6 +63,7 @@ public class FXGraphZoomHandler {
         }
 
         if (evolvePosition) {
+
             for (FXNode theNode : graph.model.getNodes()) {
                 theNode.setZoomLevel(currentZoomLevel);
             }

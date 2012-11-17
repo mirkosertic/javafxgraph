@@ -31,10 +31,6 @@ public class FXGraphModel {
         nodes.put(aNode.wrappedNode, aNode);
     }
 
-    public FXNode getNodeFor(Object source) {
-        return nodes.get(source);
-    }
-
     public Collection<FXNode> getNodes() {
         return nodes.values();
     }
