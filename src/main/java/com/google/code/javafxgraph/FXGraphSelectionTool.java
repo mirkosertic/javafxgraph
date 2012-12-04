@@ -245,7 +245,7 @@ public class FXGraphSelectionTool extends FXTool {
                         theNode.translatePosition(movementX, movementY, zoomHandler.currentZoomLevel);
                     }
                 } else {
-                    pressedWaypoint.translatePosition(movementX, movementY, zoomHandler.currentZoomLevel);
+                    pressedWaypoint.translatePosition(movementX / zoomHandler.currentZoomLevel, movementY / zoomHandler.currentZoomLevel, zoomHandler.currentZoomLevel);
                 }
 
 
